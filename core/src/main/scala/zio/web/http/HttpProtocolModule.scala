@@ -1,6 +1,8 @@
 package zio.web.http
 
 import zio._
+import zio.blocking.Blocking
+import zio.logging.Logging
 import zio.web.http.model._
 import zio.web._
 
@@ -9,24 +11,30 @@ import java.io.IOException
 trait HttpProtocolModule extends ProtocolModule {
   type ServerConfig       = HttpServerConfig
   type ClientConfig       = HttpClientConfig
-  type ServerService      = Any
+  type ServerService      = HttpServer
   type Middleware[-R, +E] = HttpMiddleware[R, E]
-  type MinMetadata        = Any
-  type MaxMetadata        = Route with Method
+  type MinMetadata[+A]    = HttpAnn[A]
 
   val defaultProtocol: codec.Codec
 
   val allProtocols: Map[String, codec.Codec]
 
-  override def makeServer[M >: MaxMetadata <: MinMetadata, R <: Has[ServerConfig], E, A](
+  def makeServer[M[+_] <: MinMetadata[_], R <: Has[ServerConfig]: Tag, E, Ids: Tag](
     middleware: Middleware[R, E],
-    endpoints: Endpoints[M, A]
-  ): ZLayer[R, IOException, Has[ServerService]] = ???
+    endpoints: Endpoints[M, Ids],
+    handlers: Handlers[M, R, Ids]
+  ): ZLayer[R with Blocking with Logging, IOException, Has[ServerService]] = {
+    val _ = middleware
 
-  override def makeDocs[M >: MaxMetadata <: MinMetadata](endpoints: Endpoints[M, _]): ProtocolDocs =
+    ZLayer.fromManaged(
+      for {
+        config <- ZIO.service[ServerConfig].toManaged_
+        env    <- ZIO.environment[R].toManaged_
+        server <- HttpServer.build(config, endpoints, handlers, env)
+      } yield server
+    )
+  }
+
+  override def makeDocs[R, M[+_] <: MinMetadata[_]](endpoints: Endpoints[M, _]): ProtocolDocs =
     ???
-
-  override def makeClient[M >: MaxMetadata <: MinMetadata, A](
-    endpoints: Endpoints[M, A]
-  ): ZLayer[Has[ClientConfig], IOException, Has[ClientService[A]]] = ???
 }

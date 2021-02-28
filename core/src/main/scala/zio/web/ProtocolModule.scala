@@ -2,25 +2,27 @@ package zio.web
 
 import java.io.IOException
 
-import _root_.zio.{ Has, ZLayer }
+import zio.{ Has, Tag, ZLayer }
+import zio.blocking.Blocking
+import zio.logging.Logging
 
-trait ProtocolModule extends EndpointModule {
+trait ProtocolModule {
   type ServerConfig
   type ClientConfig
   type ServerService
   type ProtocolDocs
   type Middleware[-R, +E]
-  type MinMetadata
-  type MaxMetadata
+  type MinMetadata[+_]
 
-  def makeServer[M >: MaxMetadata <: MinMetadata, R <: Has[ServerConfig], E, A](
+  def makeServer[M[+_] <: MinMetadata[_], R <: Has[ServerConfig]: Tag, E, Ids: Tag](
     middleware: Middleware[R, E],
-    endpoints: Endpoints[M, A]
-  ): ZLayer[R, IOException, Has[ServerService]]
+    endpoints: Endpoints[M, Ids],
+    handlers: Handlers[M, R, Ids]
+  ): ZLayer[R with Blocking with Logging, IOException, Has[ServerService]]
 
-  def makeDocs[M >: MaxMetadata <: MinMetadata](endpoints: Endpoints[M, _]): ProtocolDocs
+  def makeDocs[R, M[+_] <: MinMetadata[_]](endpoints: Endpoints[M, _]): ProtocolDocs
 
-  def makeClient[M >: MaxMetadata <: MinMetadata, A](
-    endpoints: Endpoints[M, A]
-  ): ZLayer[Has[ClientConfig], IOException, Has[ClientService[A]]]
+  def makeClient[M[+_] <: MinMetadata[_], Ids](
+    endpoints: Endpoints[M, Ids]
+  ): ZLayer[Has[ClientConfig], IOException, Has[ClientService[Ids]]] = ???
 }
