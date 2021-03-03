@@ -8,30 +8,36 @@ import zio.{ Has, Tag, ZIO }
 sealed trait Endpoints[-M[+_], Ids0] { self =>
   type Ids = Ids0
 
-  final def +[M1[+_] <: M[_]](endpoint: Endpoint[M1, _, _, _]): Endpoints[M1, Ids with endpoint.Id] =
-    Endpoints.Cons[M1, endpoint.Id, Ids, endpoint.type, Endpoints[M1, Ids]](
-      endpoint,
-      self.asInstanceOf[Endpoints[M1, Ids]]
+  final def +[M1[+_] <: M[_]](endpoint: Endpoint[M1, _, _, _]): Endpoints[M1, Ids with endpoint.Id] = {
+    type Head = Endpoint.Aux[M1, endpoint.Params, endpoint.Input, endpoint.Output, endpoint.Id]
+    type Tail = Endpoints[M1, self.Ids]
+
+    Endpoints.Cons[M1, endpoint.Id, self.Ids, Head, Tail](
+      endpoint.asInstanceOf[Head],
+      self.asInstanceOf[Tail]
     )
+  }
+
+  def invoke[I, O](endpoint: Endpoint[M, Unit, I, O])(input: I)(
+    implicit ev: Ids <:< endpoint.Id,
+    tt: Tag[ClientService[Ids]]
+  ): ZIO[Has[ClientService[Ids]], Throwable, O] =
+    ZIO.accessM[Has[ClientService[Ids]]](_.get.invoke(endpoint)(input))
 
   def invoke[P, I, O](endpoint: Endpoint[M, P, I, O])(input: I, params: P)(
     implicit ev: Ids <:< endpoint.Id,
     tt: Tag[ClientService[Ids]]
   ): ZIO[Has[ClientService[Ids]], Throwable, O] =
     ZIO.accessM[Has[ClientService[Ids]]](_.get.invoke(endpoint)(input, params))
-
-  def invoke[I, O](endpoint: Endpoint[M, Unit, I, O])(input: I)(
-    implicit ev: Ids <:< endpoint.Id,
-    tt: Tag[ClientService[Ids]]
-  ): ZIO[Has[ClientService[Ids]], Throwable, O] =
-    ZIO.accessM[Has[ClientService[Ids]]](_.get.invoke(endpoint)(input, ()))
 }
 
 object Endpoints {
+
   final case class Cons[M1[+_], Id, Ids, E <: Endpoint.Aux[M1, _, _, _, Id], T <: Endpoints[M1, Ids]] private[web] (
     endpoint: E,
     tail: T
   ) extends Endpoints[M1, Ids with Id]
+
   sealed trait Empty extends Endpoints[Any, Any]
 
   private[web] case object Empty extends Empty

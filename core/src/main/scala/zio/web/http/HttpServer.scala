@@ -93,7 +93,10 @@ final class HttpServer private (
   private def write(key: SelectionKey): ZIO[Logging, IOException, Unit] =
     for {
       _ <- log.debug("Writing connection")
-      _ = key
+      _ <- key.attachment.flatMap {
+            case Some(attached) => attached.asInstanceOf[HttpConnection].write
+            case None           => log.error("Connection is not ready to be written")
+          }
     } yield ()
 
   private val run: ZIO[Blocking with Clock with Logging, IOException, Nothing] =
@@ -117,8 +120,8 @@ object HttpServer {
       address    <- SocketAddress.inetSocketAddress(config.host, config.port).toManaged_
       channel    <- openChannel(address, 0)
       selector   <- Selector.make.toManaged(_.close.tapCause(cause => log.error("Closing selector failed", cause)).orDie)
-      router     <- HttpRouter.make(endpoints)
-      controller <- HttpController.make(handlers, env)
+      router     <- HttpRouter.make[M](endpoints)
+      controller <- HttpController.make[M, R, Ids](handlers, env)
     } yield new HttpServer(
       router,
       controller.asInstanceOf[HttpController[Any]],
