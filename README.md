@@ -1,8 +1,8 @@
 # ZIO-WEB
 
-| CI | Release | Issues |  Discord |
-| --- | --- | --- | --- |
-| [![Build Status][badge-ci]][link-ci] | [![Release Artifacts][badge-sonatype]][link-sonatype] | [![Average time to resolve an issue][badge-iim]][link-iim] | [![badge-discord]][link-discord] |
+| Project Stage | CI | Release | Issues |  Discord |
+| --- | --- | --- | --- | --- |
+| [![Project stage][Stage]][Stage-Page] | [![Build Status][badge-ci]][link-ci] | [![Release Artifacts][badge-sonatype]][link-sonatype] | [![Average time to resolve an issue][badge-iim]][link-iim] | [![badge-discord]][link-discord] |
 
 ZIO Web supports the features you need to be productive:
 
@@ -61,3 +61,5 @@ libraryDependencies += "dev.zio" %% "zio-web-core" % "<version>"
 [link-sonatype]: https://oss.sonatype.org/content/repositories/releases/dev/zio/zio-http-core_2.12/
 [link-iim]: https://isitmaintained.com/project/zio/zio-web
 [link-discord]: https://discord.gg/WUyWFfsP "Discord"
+[Stage]: https://img.shields.io/badge/Project%20Stage-Research-orange.svg
+[Stage-Page]: https://github.com/zio/zio/wiki/Project-Stages
