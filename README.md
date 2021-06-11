@@ -1,10 +1,10 @@
-# ZIO-WEB
+# ZIO Microservice
 
 | Project Stage | CI | Release | Issues |  Discord |
 | --- | --- | --- | --- | --- |
 | [![Project stage][Stage]][Stage-Page] | [![Build Status][badge-ci]][link-ci] | [![Release Artifacts][badge-sonatype]][link-sonatype] | [![Average time to resolve an issue][badge-iim]][link-iim] | [![badge-discord]][link-discord] |
 
-ZIO Web supports the features you need to be productive:
+ZIO Microservice supports the features you need to be productive:
 
  * **Endpoints**. Define reliable and scalable endpoints concisely, type-safely, and composably.
  * **Protocol-Agnostic**. Deploy endpoints to any supported protocol, including HTTP and gRPC.
@@ -14,7 +14,7 @@ ZIO Web supports the features you need to be productive:
    * **Documentation**. Generate documentation that is automatically in-sync with the endpoints.
    * **Client**. Interact with an endpoint type-safely from Scala without writing any code.
  * Middleware-friendly. Middleware is type-safe and compositional and can include built-in middleware or third-party middleware, or combinations.
-   * **Metrics/Monitoring**. Built-in integration with ZIO ZMX.
+   * **Metrics/Monitoring**. Built-in integration with ZIO Metrics.
    * **Rate-limiting**. Customizable rate-limiting with DDOS protection.
    * **Logging**. Request/response logging in Common Log format.
    * Via third-party libraries, pluggable authentication, authorization, persistence, caching, session management.
@@ -37,7 +37,7 @@ Compared to the competition, ZIO Web features:
 
 ## Protocols
 
-ZIO Web supports the following protocols out-of-the-box:
+ZIO Microservice supports the following protocols out-of-the-box:
 
 * HTTP
 * WebSockets
