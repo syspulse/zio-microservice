@@ -20,7 +20,7 @@ ZIO Microservice supports the features you need to be productive:
    * Via third-party libraries, pluggable authentication, authorization, persistence, caching, session management.
  * **High-performance**. Fastest functional Scala library.
 
-Compared to the competition, ZIO Web features: 
+Compared to the competition, ZIO Microservice features: 
 
  * ZIO native
  * Beginner-friendly
