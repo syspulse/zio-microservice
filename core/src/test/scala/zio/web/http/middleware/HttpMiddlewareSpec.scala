@@ -17,9 +17,11 @@ import java.io.{ ByteArrayOutputStream, File }
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
+import java.util.Locale
 
 object HttpMiddlewareSpec extends DefaultRunnableSpec {
-
+  Locale.setDefault(new Locale("en", "US"));
+  
   def spec =
     suite("HttpMiddleware")(loggingSpec, basicAuthSpec)
 
